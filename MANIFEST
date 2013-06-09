@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dzil-tester/DZT/debian/control
+dzil-tester/DZT/lib/DZT.pm
+lib/Dist/Zilla/Plugin/ChangelogFromGit/Debian/Sequential.pm
+t/dzil-tester.t
+t/release-pod-syntax.t
