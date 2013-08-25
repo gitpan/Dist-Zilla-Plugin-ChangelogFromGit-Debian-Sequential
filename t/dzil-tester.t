@@ -7,9 +7,9 @@ use Test::DZil;
 use Git::Wrapper;
 use File::pushd qw(pushd);
 
-use DDP;
-
 my ($zilla, $pushd);
+
+my $FIRST_RELEASE_CHANGELOG;
 
 sub init_zilla {
     my ($version) = @_;
@@ -72,9 +72,15 @@ sub init_zilla {
 
     if ($version == 2) {
         $git->tag('0.1');
+        $git->checkout(-b => 'fix_gitignore');
         system "echo .proverc >>.gitignore";
-        $git->add(-f => '.gitignore');
+        open(my $fh, '>', 'debian/changelog') || die "Cannot create file 'debian/changelog': $!";
+        print $fh $FIRST_RELEASE_CHANGELOG;
+        close($fh);
+        $git->add(-f => '.gitignore', 'debian/changelog');
         $git->commit({message => 'Fixed .gitignore'});
+        $git->checkout('master');
+        $git->merge('--no-ff', 'fix_gitignore');
     }
 }
 
@@ -82,7 +88,7 @@ init_zilla(1);
 
 $zilla->release;
 
-my $content = $zilla->slurp_file('source/debian/changelog');
+my $content = $FIRST_RELEASE_CHANGELOG = $zilla->slurp_file('source/debian/changelog');
 
 like(
     $content, qr/^libdzt-perl \(0\.1\) \w+; urgency=low
@@ -122,7 +128,7 @@ libdzt-perl \(0\.1\) \w+; urgency=low
   \* Initial commit
 
  -- .+? <.+?>  \w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}
-$/s, 'Checking first release changelog'
+$/s, 'Checking second release changelog'
 );
 
 undef($pushd);

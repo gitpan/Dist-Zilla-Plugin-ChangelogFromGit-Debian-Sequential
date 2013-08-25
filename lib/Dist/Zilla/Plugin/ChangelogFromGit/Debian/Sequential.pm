@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential;
 {
-  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.1';
+  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.2';
 }
 
 # ABSTRACT: Add changelog entries into debain/changelog
@@ -27,7 +27,7 @@ sub render_changelog {
     my $changelog_file = $self->_get_file('debian/changelog');
     if ($changelog_file) {
         my $changelog = changelog_parse(file => $changelog_file->_original_name);
-        ($pkg_name, $pkg_distr, $prev_version) = map {$changelog->{$_}} qw(Source Version Distribution);
+        ($pkg_name, $pkg_distr, $prev_version) = map {$changelog->{$_}} qw(Source Distribution Version);
         $content = $changelog_file->content;
     } else {
         my $control = Debian::Control->new();
@@ -50,17 +50,21 @@ sub render_changelog {
     local $Text::Wrap::columns = $self->wrap_column();
 
     $self->logger->log_fatal('Unsetted envirement variable DEBFULLNAME') unless $ENV{'DEBFULLNAME'};
-    $self->logger->log_fatal('Unsetted envirement variable DEBEMAIL') unless $ENV{'DEBEMAIL'};
+    $self->logger->log_fatal('Unsetted envirement variable DEBEMAIL')    unless $ENV{'DEBEMAIL'};
 
     foreach my $release ($self->all_releases) {
         next if $release->has_no_changes && $release->version ne 'HEAD';
         next if $release->version le $prev_version;
 
-        my @changes = map {
-            my $text = $_->description;
+        my @changes;
+        foreach my $change (@{$release->changes}) {
+            # Ignoring merges
+            next if Git::Repository::Log::Iterator->new($change->change_id)->next->parent > 1;
+
+            my $text = $change->description;
             chomp($text);
-            fill('  * ', '    ', $text);
-        } @{$release->changes};
+            push(@changes, fill('  * ', '    ', $text));
+        }
 
         my $version = $release->version;
         $version = $self->zilla->version if $version eq 'HEAD';
@@ -83,6 +87,18 @@ sub after_release {
     open(my $fh, '>', $fn) || $self->logger->log_fatal("Cannot write into '$fn': $!");
     print $fh $self->_get_file('debian/changelog')->content;
     close($fh);
+}
+
+sub add_file {
+    my ($self, $file) = @_;
+
+    if (my $added_file = $self->_get_file($file->name)) {
+        $added_file->content($file->content);
+    } else {
+        return $self->SUPER::add_file($file);
+    }
+
+    return;
 }
 
 sub _get_file {

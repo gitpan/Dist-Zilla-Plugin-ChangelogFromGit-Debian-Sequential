@@ -12,7 +12,6 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Add changelog entries into debain/changelog",
   "AUTHOR" => "Sergei Svistunov <sergei-svistunov\@yandex.ru>",
   "BUILD_REQUIRES" => {
-    "DDP" => 0,
     "File::pushd" => 0,
     "Git::Wrapper" => 0,
     "Test::DZil" => 0,
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Text::Wrap" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
