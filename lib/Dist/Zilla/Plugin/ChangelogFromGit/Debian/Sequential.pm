@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential;
 {
-  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.2';
+  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.3';
 }
 
 # ABSTRACT: Add changelog entries into debain/changelog
@@ -59,7 +59,10 @@ sub render_changelog {
         my @changes;
         foreach my $change (@{$release->changes}) {
             # Ignoring merges
-            next if Git::Repository::Log::Iterator->new($change->change_id)->next->parent > 1;
+            my $log = Git::Repository::Log::Iterator->new($change->change_id);
+            my $parents = $log->next->parent;
+            $log->{'cmd'}->close();
+            next if $parents > 1;
 
             my $text = $change->description;
             chomp($text);
