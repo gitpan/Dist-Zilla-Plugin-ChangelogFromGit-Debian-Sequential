@@ -34,9 +34,10 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::AfterRelease" => 0,
     "Dpkg::Changelog::Parse" => 0,
     "Moose" => 0,
-    "Text::Wrap" => 0
+    "Text::Wrap" => 0,
+    "version" => 0
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

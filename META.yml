@@ -27,4 +27,5 @@ requires:
   Dpkg::Changelog::Parse: 0
   Moose: 0
   Text::Wrap: 0
-version: 0.3
+  version: 0
+version: 0.4
