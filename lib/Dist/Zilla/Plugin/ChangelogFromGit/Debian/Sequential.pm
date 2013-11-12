@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential;
 {
-  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.4';
+  $Dist::Zilla::Plugin::ChangelogFromGit::Debian::Sequential::VERSION = '0.5';
 }
 
 # ABSTRACT: Add changelog entries into debain/changelog
@@ -69,7 +69,7 @@ sub render_changelog {
 
             my $text = $change->description;
             chomp($text);
-            push(@changes, fill('  * ', '    ', $text));
+            push(@changes, fill('  * ', '    ', $text || 'No changes'));
         }
 
         my $version = $release->version;
