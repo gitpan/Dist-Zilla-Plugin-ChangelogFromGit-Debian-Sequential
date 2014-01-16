@@ -28,4 +28,4 @@ requires:
   Moose: 0
   Text::Wrap: 0
   version: 0
-version: 0.5
+version: 0.6
